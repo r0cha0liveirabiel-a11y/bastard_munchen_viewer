@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Bastard München — test du viewer 360°</title>
+
+  <!-- 1. Styles du viewer -->
+  <link rel="stylesheet" href="tshirt-viewer.css">
+
+  <!-- Styles de cette page de test uniquement (inutiles sur ton site) -->
+  <style>
+    body { margin: 0; background: #fff; font-family: system-ui, sans-serif; color: #000; }
+    .demo { min-height: 100vh; display: grid; place-items: center; padding: 24px; box-sizing: border-box; }
+    .demo-card { all: unset; cursor: pointer; display: grid; gap: 12px; justify-items: center; }
+    .demo-card img { width: min(80vw, 420px); height: auto; display: block; }
+    .demo-card span { font-size: 15px; text-decoration: underline; text-underline-offset: 4px; }
+    .demo-card:focus-visible { outline: 2px solid #000; outline-offset: 8px; }
+  </style>
+</head>
+<body>
+  <main class="demo">
+    <!-- 2. N'importe quel élément avec data-tshirt-viewer ouvre le viewer au clic -->
+    <button type="button" class="demo-card" data-tshirt-viewer>
+      <img src="assets/tshirt/h/bastard_munchen_H00000000.webp0000.webp" alt="T-shirt Bastard München, vue de face">
+      <span>Voir en 360°</span>
+    </button>
+  </main>
+
+  <!-- 3. Script du viewer, puis configuration -->
+  <script src="tshirt-viewer.js"></script>
+  <script>
+    TshirtViewer.init({
+      // 72 images par séquence, numérotées de 0000 (vue de face) à 0071
+      frames: 72,
+      firstNumber: 0,
+      pad: 4,
+
+      // La vue de face de H sert aussi pour V : pas besoin de V...0000
+      sharedFront: true,
+
+      // Chemin de chaque image. num arrive déjà formaté sur 4 chiffres (ex. "0018").
+      // Séquences : bastard_munchen_H00000000.webp0000.webp … webp0071.webp
+      // Zoom 6K    : bastard_munchen_6k_H00000000.webp0018 (avec ou sans .webp à la fin, les deux sont essayés)
+      src: (kind, axis, num) => {
+        if (kind === 'zoom') {
+          const base = `assets/tshirt/zoom/bastard_munchen_6k_${axis}00000000.webp${num}`;
+          return [base, base + '.webp'];
+        }
+        return `assets/tshirt/${axis.toLowerCase()}/bastard_munchen_${axis}00000000.webp${num}.webp`;
+      },
+
+      // Pas d'aperçus basse définition
+      lowRes: false,
+
+      // Numéros des images qui existent en 6K
+      zoomFrames: {
+        H: [0, 18, 36, 54],
+        V: [18, 36, 54]
+      },
+
+      // Passe à true si le t-shirt tourne dans le mauvais sens en glissant
+      invertH: false,
+      invertV: false,
+
+      // Sensibilité : pixels de glisser pour passer à l'image suivante (plus petit = plus rapide)
+      pixelsPerFrame: 8,
+
+      // Doit être exactement la couleur de fond de ton site
+      background: '#ffffff'
+    });
+  </script>
+</body>
+</html>

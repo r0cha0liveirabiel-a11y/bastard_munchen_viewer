@@ -1,0 +1,165 @@
+/* TshirtViewer — styles
+   Le viewer reprend la police du site (font-family: inherit).
+   --tsv-bg est réglé par l'option "background" du script. */
+
+.tsv {
+  --tsv-bg: #ffffff;
+  --tsv-fg: #000000;
+  --tsv-muted: rgba(0, 0, 0, 0.5);
+  --tsv-line: rgba(0, 0, 0, 0.12);
+  --tsv-hover: rgba(0, 0, 0, 0.06);
+  --tsv-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--tsv-bg);
+  color: var(--tsv-fg);
+  font-family: inherit;
+  opacity: 0;
+  transition: opacity 0.25s var(--tsv-ease);
+}
+
+.tsv[hidden] { display: none; }
+.tsv.is-open { opacity: 1; }
+
+html.tsv-lock,
+html.tsv-lock body { overflow: hidden; }
+
+/* Zone de rendu */
+.tsv__canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: grab;
+  outline: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.tsv__canvas:active { cursor: grabbing; }
+.tsv__canvas:focus-visible { box-shadow: inset 0 0 0 2px var(--tsv-fg); }
+
+/* Boutons */
+.tsv__btn {
+  appearance: none;
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.tsv__btn svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.tsv__btn:hover { background: var(--tsv-hover); }
+.tsv__btn:focus-visible { outline: 2px solid var(--tsv-fg); outline-offset: 2px; }
+
+.tsv__close {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  right: calc(16px + env(safe-area-inset-right, 0px));
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--tsv-line);
+  background: var(--tsv-bg);
+}
+
+/* Barre de zoom */
+.tsv__controls {
+  position: absolute;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid var(--tsv-line);
+  border-radius: 999px;
+  background: var(--tsv-bg);
+}
+.tsv__zoom {
+  min-width: 4.2em;
+  font-size: 13px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--tsv-muted);
+}
+.tsv__sep {
+  width: 1px;
+  height: 20px;
+  margin: 0 4px;
+  background: var(--tsv-line);
+}
+.tsv.is-zoom-loading .tsv__zoom { animation: tsv-pulse 0.9s ease-in-out infinite alternate; }
+
+@keyframes tsv-pulse {
+  from { opacity: 1; }
+  to { opacity: 0.3; }
+}
+
+/* Aide au premier affichage, disparaît à la première interaction */
+.tsv__hint {
+  position: absolute;
+  left: 50%;
+  bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  margin: 0;
+  transform: translateX(-50%);
+  font-size: 13px;
+  white-space: nowrap;
+  color: var(--tsv-muted);
+  pointer-events: none;
+  transition: opacity 0.4s var(--tsv-ease);
+}
+.tsv.is-touched .tsv__hint { opacity: 0; }
+
+/* Progression du chargement */
+.tsv__loader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  transition: opacity 0.5s var(--tsv-ease);
+}
+.tsv__loader-bar {
+  display: block;
+  height: 2px;
+  background: var(--tsv-fg);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s linear;
+}
+.tsv__loader-text {
+  position: absolute;
+  top: calc(30px + env(safe-area-inset-top, 0px));
+  left: calc(24px + env(safe-area-inset-left, 0px));
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--tsv-muted);
+}
+.tsv.is-loaded .tsv__loader { opacity: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tsv,
+  .tsv__hint,
+  .tsv__loader,
+  .tsv__loader-bar { transition: none; }
+  .tsv.is-zoom-loading .tsv__zoom { animation: none; }
+}
